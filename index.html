@@ -1,24 +1,394 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden AI</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f4f4f9;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        h1 {
-            color: #d4af37;
+
+        body {
+            background-color: #171717;
+            color: #f1f1f1;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar ChatGPT Style */
+        .sidebar {
+            width: 260px;
+            background-color: #0d0d0d;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2a2a2a;
+        }
+
+        .new-chat-btn {
+            background-color: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .chat-history {
+            margin-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-size: 12px;
+            color: #888;
+            padding: 8px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #ccc;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: #212121;
+            color: #ffd700;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            background-color: #171717;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #0d0d0d;
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 10%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Welcome Message Screen */
+        .welcome-screen {
+            margin: auto;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .welcome-screen h1 {
+            font-size: 32px;
+            color: #ffd700;
+            margin-bottom: 12px;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .welcome-screen p {
+            color: #aaa;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .suggestion-card {
+            background: #212121;
+            border: 1px solid #333;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #ddd;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .suggestion-card:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+            background-color: #2a2a2a;
+        }
+
+        /* Chat Message Bubbles */
+        .message {
+            display: flex;
+            gap: 16px;
+            max-width: 85%;
+            line-height: 1.6;
+            font-size: 15px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .user .avatar {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        .ai .avatar {
+            background-color: #ffd700;
+            color: #111;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 14px;
+        }
+
+        .user .message-content {
+            background-color: #2f2f2f;
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Golden Yellow Answer Design */
+        .ai .message-content {
+            background-color: #262208;
+            color: #ffe600;
+            border: 1px solid #8b7500;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
+        }
+
+        /* Input Box Area */
+        .input-area {
+            padding: 20px 10%;
+            background-color: #171717;
+        }
+
+        .input-wrapper {
+            display: flex;
+            background-color: #212121;
+            border: 1px solid #ffd700;
+            border-radius: 28px;
+            padding: 8px 16px;
+            align-items: center;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            padding: 10px;
+            outline: none;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #777;
+        }
+
+        .send-btn {
+            background-color: #ffd700;
+            color: #111;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #ffea00;
+            transform: scale(1.05);
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Golden AI</h1>
-    <p>My website is live and working successfully!</p>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <button class="new-chat-btn" onclick="startNewChat()">
+            <span>+</span> New Chat
+        </button>
+        <div class="chat-history">
+            <div class="history-title">History</div>
+            <div class="history-item">✨ Welcome to Golden AI</div>
+            <div class="history-item">💡 AI Project Ideas</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="chat-header">
+            <span>Golden AI</span>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <div class="welcome-screen" id="welcomeScreen">
+                <h1>Golden AI</h1>
+                <p>কীভাবে সাহায্য করতে পারি? যেকোনো প্রশ্ন লিখুন।</p>
+                <div class="suggestion-grid">
+                    <div class="suggestion-card" onclick="sendSuggestion('Golden AI কী এবং এটি কীভাবে কাজ করে?')">
+                        <strong>Golden AI পরিচয়</strong><br>সহজ ভাষায় জানুন
+                    </div>
+                    <div class="suggestion-card" onclick="sendSuggestion('একটি সুন্দর বাংলা কবিতা লেখো')">
+                        <strong>কবিতা লিখুন</strong><br>সৃজনশীল লেখা
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Box -->
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Message Golden AI..." onkeydown="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">➔</button>
+            </div>
+            <div class="disclaimer">Golden AI can make mistakes. Verify important info.</div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const messageText = input.value.trim();
+            if (!messageText) return;
+
+            // Remove welcome screen if visible
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            if (welcomeScreen) welcomeScreen.remove();
+
+            const chatBox = document.getElementById('chatBox');
+
+            // Append User Message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user';
+            userMsgDiv.innerHTML = `
+                <div class="avatar">You</div>
+                <div class="message-content">${escapeHtml(messageText)}</div>
+            `;
+            chatBox.appendChild(userMsgDiv);
+
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Append AI Response (Golden Yellow Design)
+            setTimeout(() => {
+                const aiMsgDiv = document.createElement('div');
+                aiMsgDiv.className = 'message ai';
+                aiMsgDiv.innerHTML = `
+                    <div class="avatar">GAI</div>
+                    <div class="message-content">
+                        ধন্যবাদ আপনার বার্তার জন্য! 🌟<br><br>
+                        আমি <strong>Golden AI</strong>। আপনার প্রশ্নের উত্তরে আমি সর্বদা প্রস্তুত। আপনি লিখেছিলেন: "<em>${escapeHtml(messageText)}</em>"।
+                    </div>
+                `;
+                chatBox.appendChild(aiMsgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 600);
+        }
+
+        function sendSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function startNewChat() {
+            location.reload();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
 </body>
-</html>
+    </html>
+    
 
