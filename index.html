@@ -293,8 +293,8 @@
         </button>
         <div class="chat-history">
             <div class="history-title">History</div>
-            <div class="history-item">✨ Welcome to Golden AI</div>
-            <div class="history-item">💡 AI Project Ideas</div>
+            <div class="history-item"> Welcome to Golden AI</div>
+            <div class="history-item">AI Project Ideas</div>
         </div>
     </div>
 
@@ -307,13 +307,13 @@
         <div class="chat-box" id="chatBox">
             <div class="welcome-screen" id="welcomeScreen">
                 <h1>Golden AI</h1>
-                <p>কীভাবে সাহায্য করতে পারি? যেকোনো প্রশ্ন লিখুন।</p>
+                <p></p>
                 <div class="suggestion-grid">
-                    <div class="suggestion-card" onclick="sendSuggestion('Golden AI কী এবং এটি কীভাবে কাজ করে?')">
-                        <strong>Golden AI পরিচয়</strong><br>সহজ ভাষায় জানুন
+                    <div class="suggestion-card" onclick="sendSuggestion('Golden AI >
+                        <strong>Golden AI </strong><br>
                     </div>
-                    <div class="suggestion-card" onclick="sendSuggestion('একটি সুন্দর বাংলা কবিতা লেখো')">
-                        <strong>কবিতা লিখুন</strong><br>সৃজনশীল লেখা
+                    <div class="suggestion-card" onclick="sendSuggestion>
+                        <strong></strong><br>
                     </div>
                 </div>
             </div>
@@ -360,8 +360,8 @@
                 aiMsgDiv.innerHTML = `
                     <div class="avatar">GAI</div>
                     <div class="message-content">
-                        ধন্যবাদ আপনার বার্তার জন্য! 🌟<br><br>
-                        আমি <strong>Golden AI</strong>। আপনার প্রশ্নের উত্তরে আমি সর্বদা প্রস্তুত। আপনি লিখেছিলেন: "<em>${escapeHtml(messageText)}</em>"।
+                        <br><br>
+                     <strong>Golden AI</strong> <em>${escapeHtml(messageText)}</em>"।
                     </div>
                 `;
                 chatBox.appendChild(aiMsgDiv);
@@ -391,6 +391,7 @@
 </body>
     </html>
     
+
 
 
 
